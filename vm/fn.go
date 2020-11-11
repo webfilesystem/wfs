@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	b64 "encoding/base64"
+
 	xj "github.com/basgys/goxml2json"
 	"github.com/robertkrimen/otto"
 )
@@ -64,6 +66,29 @@ func NewVM() *otto.Otto {
 		return v
 	}
 	setup(vm.Set("require", require))
+
+	encode := func(call otto.FunctionCall) otto.Value {
+		str := call.Argument(0).String()
+		enc := b64.StdEncoding.EncodeToString([]byte(str))
+		v, _ := vm.ToValue(string(enc))
+		return v
+	}
+	setup(vm.Set("btoa", encode))
+
+	decode := func(call otto.FunctionCall) otto.Value {
+		str := call.Argument(0).String()
+		dec, _ := b64.URLEncoding.DecodeString(str)
+		v, _ := vm.ToValue(string(dec))
+		return v
+	}
+	setup(vm.Set("atob", decode))
+
+	consoleLog := func(call otto.FunctionCall) otto.Value {
+		str := call.Argument(0).String()
+		fmt.Printf(fmt.Sprintf("%s\n", str))
+		return otto.NullValue()
+	}
+	setup(vm.Set("log", consoleLog))
 
 	return vm
 }

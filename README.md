@@ -54,7 +54,7 @@ function download(url) {
 }
 ```
 
-### Core wfs functions
+### Core functions
 
 ```
 /*
@@ -92,7 +92,7 @@ function list(url) {
 }
 ```
 
-### Helper wfs functions
+### Helper functions
 
 The javacript interpreter supports ES5 only, but wfs adds some helper functions:
 
@@ -124,6 +124,15 @@ The require function loads js file from localhost.
 * @return {String} content The content of the file.
 */
 require(path)
+```
+
+```
+/*
+The log function prints text on the console.
+*
+* @param {String} text The text to print. 
+*/
+log(string)
 ```
 
 ### Caveat Emptor

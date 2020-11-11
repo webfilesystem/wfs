@@ -150,19 +150,23 @@ func (d *Dir) List() {
 	}
 
 	if export != nil {
-		for _, entity := range export.([]map[string]interface{}) {
-			if entity["type"].(string) == "file" {
-				size, _ := strconv.ParseUint(entity["size"].(string), 10, 64)
-				file := NewFile(d, entity["name"].(string), d.WFS, size, time.Now())
-				file.Uri = fmt.Sprintf("%s", entity["url"])
-				if file == nil {
-					log.Printf("Can't create file.")
+		found := export.([]map[string]interface{})
+
+		if found != nil {
+			for _, entity := range export.([]map[string]interface{}) {
+				if entity["type"].(string) == "file" {
+					size, _ := strconv.ParseUint(entity["size"].(string), 10, 64)
+					file := NewFile(d, entity["name"].(string), d.WFS, size, time.Now())
+					file.Uri = fmt.Sprintf("%s", entity["url"])
+					if file == nil {
+						log.Printf("Can't create file.")
+					}
 				}
-			}
-			if entity["type"].(string) == "dir" {
-				dir := NewDir(d, entity["name"].(string), entity["url"].(string), d.WFS, 4096, time.Now())
-				if dir == nil {
-					log.Printf("Can't create dir.")
+				if entity["type"].(string) == "dir" {
+					dir := NewDir(d, entity["name"].(string), entity["url"].(string), d.WFS, 4096, time.Now())
+					if dir == nil {
+						log.Printf("Can't create dir.")
+					}
 				}
 			}
 		}
@@ -189,21 +193,29 @@ func (d *Dir) Search(query string) {
 		panic(err)
 	}
 
-	found := export.([]map[string]interface{})
+	if fmt.Sprintf("%s", export) != "[]" {
+		found := export.([]map[string]interface{})
 
-	if found != nil {
-		result := NewDir(d, query, "", d.WFS, 4096, time.Now())
-		if result == nil {
-			panic(err)
-		}
+		if found != nil {
+			result := NewDir(d, query, "", d.WFS, 4096, time.Now())
+			if result == nil {
+				panic(err)
+			}
 
-		for _, entity := range export.([]map[string]interface{}) {
-			if entity["type"].(string) == "file" {
-				size, _ := strconv.ParseUint(entity["size"].(string), 10, 64)
-				file := NewFile(result, entity["name"].(string), d.WFS, size, time.Now())
-				file.Uri = fmt.Sprintf("%s", entity["url"])
-				if file == nil {
-					panic(err)
+			for _, entity := range export.([]map[string]interface{}) {
+				if entity["type"].(string) == "file" {
+					size, _ := strconv.ParseUint(entity["size"].(string), 10, 64)
+					file := NewFile(result, entity["name"].(string), d.WFS, size, time.Now())
+					file.Uri = fmt.Sprintf("%s", entity["url"])
+					if file == nil {
+						panic(err)
+					}
+				}
+				if entity["type"].(string) == "dir" {
+					dir := NewDir(result, entity["name"].(string), entity["url"].(string), d.WFS, 4096, time.Now())
+					if dir == nil {
+						log.Printf("Can't create dir.")
+					}
 				}
 			}
 		}

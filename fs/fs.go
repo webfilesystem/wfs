@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"strings"
 	"syscall"
 	"time"
@@ -14,6 +15,7 @@ import (
 	"bazil.org/fuse"
 	"bazil.org/fuse/fs"
 
+	"github.com/fsnotify/fsnotify"
 	"github.com/robertkrimen/otto"
 	flag "github.com/spf13/pflag"
 	"github.com/webfilesystem/wfs/config"
@@ -81,6 +83,7 @@ func NewFS(w io.Writer, mountpoint string) {
 		log.Fatal("Can't load configs from HOME/.wfs: %s\n", err)
 	}
 	wfs.Configs = configs
+	go watchConfig(&wfs)
 	cfiles, err := config.GetConfigFiles()
 	if err != nil {
 		log.Fatal("Can't load configs from HOME/.wfs: %s\n", err)
@@ -119,4 +122,45 @@ func signalHandler() {
 	if err != nil {
 		os.Exit(1)
 	}
+}
+
+func watchConfig(wfs *WFS) {
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer watcher.Close()
+
+	done := make(chan bool)
+	go func() {
+		for {
+			select {
+			case event, ok := <-watcher.Events:
+				if !ok {
+					return
+				}
+				//fmt.Printf("event:", event)
+				if event.Op&fsnotify.Chmod == fsnotify.Chmod {
+					//fmt.Printf(fmt.Sprintf("\nmodified file: %s\n", event.Name))
+
+					configs, err := config.LoadConfigs()
+					if err != nil {
+						log.Fatal("Can't load configs from HOME/.wfs: %s\n", err)
+					}
+					wfs.Configs = configs
+				}
+			case err, ok := <-watcher.Errors:
+				if !ok {
+					return
+				}
+				fmt.Printf("error:", err)
+			}
+		}
+	}()
+
+	err = watcher.Add(filepath.Join(os.Getenv("HOME"), ".wfs"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	<-done
 }
