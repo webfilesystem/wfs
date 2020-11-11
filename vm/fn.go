@@ -1,6 +1,7 @@
 package script
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -12,6 +13,7 @@ import (
 
 	xj "github.com/basgys/goxml2json"
 	"github.com/robertkrimen/otto"
+	"golang.org/x/oauth2"
 )
 
 func NewVM() *otto.Otto {
@@ -37,6 +39,29 @@ func NewVM() *otto.Otto {
 		return v
 	}
 	setup(vm.Set("httpGet", httpGet))
+
+	httpGetOAuth2 := func(call otto.FunctionCall) otto.Value {
+		url := call.Argument(0).String()
+		token := call.Argument(1).String()
+
+		ctx := context.Background()
+		ts := oauth2.StaticTokenSource(
+			&oauth2.Token{AccessToken: token},
+		)
+		client := oauth2.NewClient(ctx, ts)
+
+		r, err := client.Get(url)
+		if err != nil {
+			panic(err)
+		}
+		data, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			panic(err)
+		}
+		v, _ := vm.ToValue(string(data))
+		return v
+	}
+	setup(vm.Set("httpGetOAuth2", httpGetOAuth2))
 
 	xmlToJson := func(call otto.FunctionCall) otto.Value {
 		input := call.Argument(0).String()

@@ -2,6 +2,8 @@
 
 Access the web through your file system.
 
+![wfs github demo](https://raw.githubusercontent.com/webfilesystem/wfs/main/demo/github.gif)
+
 ### Example read wikipedia
 
 $ cd wfs/wikipedia
@@ -104,6 +106,17 @@ The httpGet function loads data from the web.
 * @return {String} body The response body.
 */
 httpGet(url)
+```
+
+```
+/*
+The httpGetOAuth2 function loads data from the web using OAuth2 token.
+*
+* @param {String} url The url to load. 
+* @param {String} token The token for OAuth2.
+* @return {String} body The response body.
+*/
+httpGetOAuth2(url, token)
 ```
 
 ```
