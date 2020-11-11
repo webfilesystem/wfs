@@ -1,26 +1,14 @@
 #  wfs - webfilesystem
 
-Access the web through your file system.
+Access the web through your file, scriptable with javascript.
 
-![wfs github demo](https://raw.githubusercontent.com/webfilesystem/wfs/main/demo/github.gif)
+For example search and browse Github repos in 40 LOC:
 
-### Example read wikipedia
+[](https://github.com/webfilesystem/wfs/blob/main/scripts/github.js)
 
-$ cd wfs/wikipedia
-
-$ cd mars
-
-$ ls
-
-...
-Atmosphere of Mars.txt	
-...
-Mars.txt
-...
-
-$ cat Mars.txt 
-
-> Mars is the fourth planet from the Sun and the second-smallest planet in the Solar System, ...
+<p align="center">
+  <img width="600" src="demo/github.gif">
+</p>
 
 ### How can I access xyz.com?
 

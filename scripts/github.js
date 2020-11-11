@@ -11,7 +11,6 @@ function search(query) {
 }
 
 function list(url) {
-	log("list: " + url);
 	var data = httpGet(url);
 	var json = JSON.parse(data);
 	var result = [];

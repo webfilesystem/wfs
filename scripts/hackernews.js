@@ -32,5 +32,3 @@ function download(url) {
 	}
 	return result;
 }
-
-
