@@ -98,6 +98,20 @@ httpGet(url)
 
 ```
 /*
+The httpGetOAuth1 function loads data from the web using OAuth2 token.
+*
+* @param {String} url The url to load. 
+* @param {String} key The key for OAuth1.
+* @param {String} keysecret The token for OAuth1.
+* @param {String} token The token for OAuth1.
+* @param {String} tokensecret The token for OAuth1.
+* @return {String} body The response body.
+*/
+httpGetOAuth1(url, key, keysecret, token, tokensecret)
+```
+
+```
+/*
 The httpGetOAuth2 function loads data from the web using OAuth2 token.
 *
 * @param {String} url The url to load. 

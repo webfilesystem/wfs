@@ -12,6 +12,7 @@ import (
 	b64 "encoding/base64"
 
 	xj "github.com/basgys/goxml2json"
+	"github.com/dghubble/oauth1"
 	"github.com/robertkrimen/otto"
 	"golang.org/x/oauth2"
 )
@@ -39,6 +40,30 @@ func NewVM() *otto.Otto {
 		return v
 	}
 	setup(vm.Set("httpGet", httpGet))
+
+	httpGetOAuth1 := func(call otto.FunctionCall) otto.Value {
+		url := call.Argument(0).String()
+		key := call.Argument(1).String()
+		keysecret := call.Argument(2).String()
+		token := call.Argument(3).String()
+		tokensecret := call.Argument(4).String()
+
+		c := oauth1.NewConfig(key, keysecret)
+		_token := oauth1.NewToken(token, tokensecret)
+		client := c.Client(oauth1.NoContext, _token)
+
+		r, err := client.Get(url)
+		if err != nil {
+			panic(err)
+		}
+		data, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			panic(err)
+		}
+		v, _ := vm.ToValue(string(data))
+		return v
+	}
+	setup(vm.Set("httpGetOAuth1", httpGetOAuth1))
 
 	httpGetOAuth2 := func(call otto.FunctionCall) otto.Value {
 		url := call.Argument(0).String()
