@@ -157,7 +157,12 @@ func (d *Dir) List() {
 				if entity["type"].(string) == "file" {
 					size, _ := strconv.ParseUint(entity["size"].(string), 10, 64)
 					file := NewFile(d, entity["name"].(string), d.WFS, size, time.Now())
-					file.Uri = fmt.Sprintf("%s", entity["url"])
+					if entity["url"] != nil {
+						file.Uri = fmt.Sprintf("%s", entity["url"])
+					}
+					if entity["data"] != nil {
+						file.Data = []byte(fmt.Sprintf("%s", entity["data"]))
+					}
 					if file == nil {
 						log.Printf("Can't create file.")
 					}
